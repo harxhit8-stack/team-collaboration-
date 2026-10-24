@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HARSHIT // Vibe Coder & Creative Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #060609;
+      --bg-surface: rgba(18, 18, 26, 0.65);
+      --border-dim: rgba(255, 255, 255, 0.08);
+      --border-bright: rgba(255, 255, 255, 0.22);
+      --text-main: #f4f4f6;
+      --text-muted: #8e8ea0;
+      --accent-primary: #8b5cf6;   /* Violet */
+      --accent-secondary: #06b6d4; /* Cyan */
+      --accent-tertiary: #10b981;  /* Emerald */
+      --glow-spread: rgba(139, 92, 246, 0.18);
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-vibe="cyber"] {
+      --accent-primary: #f43f5e;
+      --accent-secondary: #eab308;
+      --accent-tertiary: #06b6d4;
+      --glow-spread: rgba(244, 63, 94, 0.2);
+    }
+
+    [data-vibe="matrix"] {
+      --accent-primary: #10b981;
+      --accent-secondary: #22c55e;
+      --accent-tertiary: #a3e635;
+      --glow-spread: rgba(16, 185, 129, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Subtle Ambient Grid & Cursor Spotlight */
+    .ambient-grid {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 60%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #cursor-glow {
+      position: fixed;
+      width: 650px;
+      height: 650px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--glow-spread) 0%, transparent 65%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1;
+      transition: background 0.5s ease;
+    }
+
+    /* Floating Navigation */
+    header {
+      position: fixed;
+      top: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: min(92%, 1080px);
+    }
+
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: rgba(12, 12, 18, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-dim);
+      border-radius: 999px;
+      box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      background: var(--accent-tertiary);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent-tertiary);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.65; }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.75rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    .vibe-switcher {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-dim);
+      color: var(--text-main);
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.25s ease;
+    }
+
+    .vibe-switcher:hover {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 20px var(--glow-spread);
+      transform: translateY(-1px);
+    }
+
+    /* Main Container */
+    main {
+      position: relative;
+      z-index: 2;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 8.5rem 1.5rem 5rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 2.5rem;
+      align-items: center;
+      margin-bottom: 5.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-secondary);
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.1rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+
+    .gradient-text {
+  background: linear-gradient(135deg, var(--text-main) 20%, var(--accent-primary) 65%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text; /* <-- Add this line to clear the VS Code warning */
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradientFlow 6s linear infinite;
+}
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+      100% { background-position: 0% center; }
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.08rem;
+      max-width: 540px;
+      margin-bottom: 2rem;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 10px 25px -5px var(--glow-spread);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px var(--glow-spread);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      border: 1px solid var(--border-dim);
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--border-bright);
+    }
+
+    /* Interactive Terminal Window */
+    .terminal-card {
+      background: rgba(10, 10, 16, 0.85);
+      border: 1px solid var(--border-dim);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease-out;
+      transform-style: preserve-3d;
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot.red { background: #ef4444; }
+    .dot.yellow { background: #f59e0b; }
+    .dot.green { background: #10b981; }
+
+    .terminal-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .terminal-body {
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .cmd-line {
+      color: var(--accent-secondary);
+    }
+
+    .ai-output {
+      color: #d1d5db;
+      white-space: pre-wrap;
+    }
+
+    .cursor-blink {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: var(--accent-primary);
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Marquee Ticker */
+    .marquee-wrapper {
+      overflow: hidden;
+      border-top: 1px solid var(--border-dim);
+      border-bottom: 1px solid var(--border-dim);
+      padding: 0.9rem 0;
+      margin-bottom: 5rem;
+      background: rgba(255, 255, 255, 0.01);
+      mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 3rem;
+      width: max-content;
+      animation: scrollMarquee 26s linear infinite;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .marquee-item span {
+      color: var(--accent-primary);
+    }
+
+    @keyframes scrollMarquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* Section Header */
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2rem;
+    }
+
+    .section-head h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head span {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent-secondary);
+    }
+
+    /* Bento Grid System */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: minmax(210px, auto);
+      gap: 1.25rem;
+      margin-bottom: 5rem;
+    }
+
+    .bento-card {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-dim);
+      border-radius: 20px;
+      padding: 1.6rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    /* Dynamic Card Hover Spotlight */
+    .bento-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 255, 255, 0.08),
+        transparent 40%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .bento-card:hover::before {
+      opacity: 1;
+    }
+
+    .bento-card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-4px);
+    }
+
+    .span-2 {
+      grid-column: span 2;
+    }
+
+    .card-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-secondary);
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .bento-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .bento-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Animated Equalizer inside Bento */
+    .eq-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 44px;
+      margin-top: 1.25rem;
+    }
+
+    .bar {
+      flex: 1;
+      background: linear-gradient(to top, var(--accent-primary), var(--accent-secondary));
+      border-radius: 4px;
+      animation: eqBounce 1.2s ease-in-out infinite;
+    }
+
+    .bar:nth-child(2) { animation-delay: 0.15s; }
+    .bar:nth-child(3) { animation-delay: 0.35s; }
+    .bar:nth-child(4) { animation-delay: 0.05s; }
+    .bar:nth-child(5) { animation-delay: 0.45s; }
+    .bar:nth-child(6) { animation-delay: 0.25s; }
+    .bar:nth-child(7) { animation-delay: 0.55s; }
+    .bar:nth-child(8) { animation-delay: 0.1s; }
+
+    @keyframes eqBounce {
+      0%, 100% { height: 22%; }
+      50% { height: 95%; }
+    }
+
+    /* Interactive Prompt Playground */
+    .prompt-box {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .prompt-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-dim);
+      color: var(--text-main);
+      padding: 0.65rem 0.9rem;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .prompt-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .prompt-btn {
+      background: var(--accent-primary);
+      color: #fff;
+      border: none;
+      padding: 0 1rem;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .prompt-btn:hover {
+      opacity: 0.9;
+    }
+
+    .pill-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 1.2rem;
+    }
+
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-dim);
+      color: #d4d4d8;
+    }
+
+    footer {
+      border-top: 1px solid var(--border-dim);
+      padding: 2.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+      .span-2 {
+        grid-column: span 1;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-grid"></div>
+  <div id="cursor-glow"></div>
+
+  <header>
+    <nav class="nav-bar">
+      <div class="brand">
+        <span class="status-dot"></span>
+        <span>HARSHIT.SH // VIBE_OS</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#work">Builds</a></li>
+        <li><a href="#workflow">Workflow</a></li>
+        <li><a href="https://github.com/harxhit8-stack" target="_blank">GitHub ↗</a></li>
+      </ul>
+      <button class="vibe-switcher" id="vibeBtn" title="Switch Color Frequency">
+        <span>⚡ VIBE:</span> <strong id="vibeName">SYNTH</strong>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div>
+        <div class="badge">✨ ZERO FRICTION // HIGH FREQUENCY SHIPPING</div>
+        <h1>
+          Shipping at the <br />
+          <span class="gradient-text">Speed of Thought.</span>
+        </h1>
+        <p>
+          Full-stack builder & creative technologist blending clean architecture, rapid AI-augmented workflows, and fluid micro-interactions into production web experiences.
+        </p>
+        <div class="cta-group">
+          <a href="#work" class="btn-primary">Explore Architecture →</a>
+          <a href="https://github.com/harxhit8-stack" target="_blank" class="btn-ghost">$ git clone @harxhit8-stack</a>
+        </div>
+      </div>
+
+      <!-- LIVE STREAMING TERMINAL -->
+      <div class="terminal-card" id="tiltTerminal">
+        <div class="terminal-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">zsh — vibe-agent@studio:~</span>
+          <span>⌘K</span>
+        </div>
+        <div class="terminal-body">
+          <div class="cmd-line">$ vibe deploy --mode=hyper-minimal --fps=120</div>
+          <div class="ai-output" id="typewriter"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFINITE TECH TICKER -->
+    <div class="marquee-wrapper">
+      <div class="marquee-track">
+        <div class="marquee-item"><span>✦</span> TYPESCRIPT ARCHITECTURE</div>
+        <div class="marquee-item"><span>✦</span> PROMPT-DRIVEN DESIGN</div>
+        <div class="marquee-item"><span>✦</span> CSS GRID & BENTO UI</div>
+        <div class="marquee-item"><span>✦</span> PYTHON STREAM PROCESSING</div>
+        <div class="marquee-item"><span>✦</span> LINUX SHELL AUTOMATION</div>
+        <div class="marquee-item"><span>✦</span> ZERO-LATENCY MICRO-INTERACTIONS</div>
+        <!-- Duplicated for seamless loop -->
+        <div class="marquee-item"><span>✦</span> TYPESCRIPT ARCHITECTURE</div>
+        <div class="marquee-item"><span>✦</span> PROMPT-DRIVEN DESIGN</div>
+        <div class="marquee-item"><span>✦</span> CSS GRID & BENTO UI</div>
+        <div class="marquee-item"><span>✦</span> PYTHON STREAM PROCESSING</div>
+        <div class="marquee-item"><span>✦</span> LINUX SHELL AUTOMATION</div>
+        <div class="marquee-item"><span>✦</span> ZERO-LATENCY MICRO-INTERACTIONS</div>
+      </div>
+    </div>
+
+    <!-- BENTO GRID SHOWCASE -->
+    <div class="section-head" id="work">
+      <div>
+        <span>// 01. SYSTEM MODULES</span>
+        <h2>Engineered With Flow State</h2>
+      </div>
+      <span>HOVER CARDS TO INTERACT</span>
+    </div>
+
+    <section class="bento-grid" id="bentoGrid">
+      <!-- Featured Project 1 -->
+      <article class="bento-card span-2">
+        <div>
+          <span class="card-tag">FEATURED SHIP // 01</span>
+          <h3>TypeTasks — Reactive Task Engine</h3>
+          <p>
+            Strictly-typed productivity engine built with TypeScript and modular state persistence. Engineered for keyboard-first navigation and zero-layout-shift rendering.
+          </p>
+          <div class="pill-stack">
+            <span class="pill">TypeScript</span>
+            <span class="pill">CSS Grid</span>
+            <span class="pill">LocalFirst State</span>
+            <span class="pill">GitHub Pages</span>
+          </div>
+        </div>
+        <div class="prompt-box" id="workflow">
+          <input type="text" id="vibePrompt" class="prompt-input" placeholder="Try typing a vibe command (e.g. 'boost glow' or 'ship prod')..." />
+          <button class="prompt-btn" id="runPromptBtn">Execute ↵</button>
+        </div>
+      </article>
+
+      <!-- Live Audio/Flow State Card -->
+      <article class="bento-card">
+        <div>
+          <span class="card-tag">FLOW TELEMETRY // 02</span>
+          <h3>Deep Work Frequency</h3>
+          <p>Real-time synthwave & lo-fi telemetry powering late-night build sessions.</p>
+        </div>
+        <div>
+          <div class="eq-bars">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          </div>
+          <div class="pill-stack">
+            <span class="pill" id="bpmCounter">128 BPM // LOCKED IN</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Architecture Card -->
+      <article class="bento-card">
+        <div>
+          <span class="card-tag">SYSTEM DESIGN // 03</span>
+          <h3>Full-Stack Architecture</h3>
+          <p>End-to-end service modeling, sequence flows, and boundary-driven microservices for high-throughput delivery platforms.</p>
+        </div>
+        <div class="pill-stack">
+          <span class="pill">UML Sequence</span>
+          <span class="pill">API Gateways</span>
+          <span class="pill">REST</span>
+        </div>
+      </article>
+
+      <!-- Terminal & Algorithmic Stack -->
+      <article class="bento-card span-2">
+        <div>
+          <span class="card-tag">CORE ENGINE // 04</span>
+          <h3>Linux Shell & Python Stream Lab</h3>
+          <p>
+            From custom `.bashrc` / `.zshrc` process automation to real-time Python stream parsers and multi-modal prompt engineering frameworks (Role-Context-Task-Output).
+          </p>
+        </div>
+        <div class="pill-stack">
+          <span class="pill">Python 3</span>
+          <span class="pill">Bash / Zsh</span>
+          <span class="pill">Git Workflows</span>
+          <span class="pill">Multi-Modal Prompting</span>
+          <span class="pill">HTML5 / Flexbox</span>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      <div>DESIGNED & CODED IN FLOW STATE // HARSHIT</div>
+      <div>LATENCY: 0.4ms • FPS: 120</div>
+    </footer>
+  </main>
+
+  <script>
+    // 1. Ambient Cursor Glow Follower
+    const cursorGlow = document.getElementById('cursor-glow');
+    window.addEventListener('mousemove', (e) => {
+      cursorGlow.style.left = `${e.clientX}px`;
+      cursorGlow.style.top = `${e.clientY}px`;
+    });
+
+    // 2. Bento Card Local Mouse Spotlight
+    const cards = document.querySelectorAll('.bento-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+
+    // 3. 3D Perspective Tilt on Hero Terminal
+    const terminal = document.getElementById('tiltTerminal');
+    terminal.addEventListener('mousemove', (e) => {
+      const rect = terminal.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const rotateX = (-y / 18).toFixed(2);
+      const rotateY = (x / 18).toFixed(2);
+      terminal.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    terminal.addEventListener('mouseleave', () => {
+      terminal.style.transform = `perspective(900px) rotateX(0deg) rotateY(0deg)`;
+    });
+
+    // 4. Live Typewriter Terminal Simulation
+    const typewriterEl = document.getElementById('typewriter');
+    const logs = [
+      "▸ Initializing Role-Context-Task-Output engine...",
+      "▸ Compiling TypeScript modules [zero errors]",
+      "▸ Injecting GPU-accelerated CSS Grid & Bento shaders...",
+      "▸ Connecting @harxhit8-stack production pipeline...",
+      "✔ STATUS: Vibe check passed. Ready to ship. ⚡"
+    ];
+
+    let lineIdx = 0;
+    let charIdx = 0;
+    let currentBuffer = "";
+
+    function streamTerminal() {
+      if (lineIdx < logs.length) {
+        if (charIdx < logs[lineIdx].length) {
+          currentBuffer += logs[lineIdx].charAt(charIdx);
+          typewriterEl.innerHTML = currentBuffer + '<span class="cursor-blink"></span>';
+          charIdx++;
+          setTimeout(streamTerminal, 22);
+        } else {
+          currentBuffer += "\n";
+          lineIdx++;
+          charIdx = 0;
+          setTimeout(streamTerminal, 380);
+        }
+      } else {
+        typewriterEl.innerHTML = currentBuffer + '<span class="cursor-blink"></span>';
+      }
+    }
+    setTimeout(streamTerminal, 500);
+
+    // 5. Interactive Vibe Theme Switcher
+    const vibes = [
+      { id: 'synth', label: 'SYNTH', bpm: '128 BPM // LOCKED IN' },
+      { id: 'cyber', label: 'CYBER', bpm: '145 BPM // OVERCLOCKED' },
+      { id: 'matrix', label: 'KERNEL', bpm: '110 BPM // ROOT ACCESS' }
+    ];
+    let currentVibe = 0;
+    const vibeBtn = document.getElementById('vibeBtn');
+    const vibeName = document.getElementById('vibeName');
+    const bpmCounter = document.getElementById('bpmCounter');
+
+    vibeBtn.addEventListener('click', () => {
+      currentVibe = (currentVibe + 1) % vibes.length;
+      const selected = vibes[currentVibe];
+      if (selected.id === 'synth') {
+        document.documentElement.removeAttribute('data-vibe');
+      } else {
+        document.documentElement.setAttribute('data-vibe', selected.id);
+      }
+      vibeName.textContent = selected.label;
+      bpmCounter.textContent = selected.bpm;
+    });
+
+    // 6. Interactive Prompt Bar inside Bento Card
+    const promptInput = document.getElementById('vibePrompt');
+    const runPromptBtn = document.getElementById('runPromptBtn');
+
+    function executeCustomPrompt() {
+      const val = promptInput.value.trim();
+      if (!val) return;
+      currentBuffer += `\n$ vibe "${val}"\n✔ Executed [${val}] in 12ms ✨`;
+      typewriterEl.innerHTML = currentBuffer + '<span class="cursor-blink"></span>';
+      promptInput.value = '';
+      vibeBtn.click(); // Pulse theme on command execution
+    }
+
+    runPromptBtn.addEventListener('click', executeCustomPrompt);
+    promptInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') executeCustomPrompt();
+    });
+  </script>
+</body>
+</html>
